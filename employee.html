@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="bg">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,8 +9,11 @@
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0d1117" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
 </head>
+
 <body>
   <div class="bg-orbs">
     <div class="orb orb-1"></div>
@@ -264,8 +268,10 @@
         <div class="card-title-row"><span class="card-title">📊 Статистика за месеца</span></div>
         <div class="profile-stats-grid">
           <div class="p-stat"><span class="p-val" id="prof-hours">0</span><span class="p-lbl">Часа</span></div>
-          <div class="p-stat"><span class="p-val green" id="prof-salary">0 лв.</span><span class="p-lbl">Заплата</span></div>
-          <div class="p-stat"><span class="p-val red" id="prof-penalties">0 лв.</span><span class="p-lbl">Наказания</span></div>
+          <div class="p-stat"><span class="p-val green" id="prof-salary">0 лв.</span><span class="p-lbl">Заплата</span>
+          </div>
+          <div class="p-stat"><span class="p-val red" id="prof-penalties">0 лв.</span><span
+              class="p-lbl">Наказания</span></div>
           <div class="p-stat"><span class="p-val" id="prof-days">0</span><span class="p-lbl">Работни дни</span></div>
         </div>
       </div>
@@ -290,6 +296,21 @@
             <span class="setting-desc">Зададена от мениджъра</span>
           </div>
           <span class="mono-badge accent" id="prof-rate">— лв./ч</span>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <span class="setting-label">Език</span>
+            <span class="setting-desc">Смяна на езика на приложението</span>
+          </div>
+          <div class="setting-action">
+            <select id="lang-select-profile" class="form-input form-select"
+              style="padding: 4px 8px; width: auto; font-size: 0.85rem;" onchange="changeLang(this.value)">
+              <option value="bg">Български</option>
+              <option value="en">English</option>
+              <option value="ru">Русский</option>
+            </select>
+          </div>
         </div>
 
         <div class="setting-row">
@@ -351,8 +372,10 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
+  <script src="lang.js"></script>
   <script src="supabase.js"></script>
   <script src="app.js"></script>
   <script>initEmployeeDashboard();</script>
 </body>
+
 </html>

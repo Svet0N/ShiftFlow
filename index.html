@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="bg">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,14 +9,27 @@
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0d1117" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
 </head>
+
 <body class="login-page">
 
   <div class="bg-orbs">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
+  </div>
+
+  <div style="position: absolute; top: 1.5rem; right: 1.5rem; z-index: 100;">
+    <select id="lang-select" class="form-input form-select glass-card"
+      style="padding: 6px 12px; font-size: 0.9rem; background-color: rgba(255,255,255,0.05); color: var(--text-color);"
+      onchange="changeLang(this.value)">
+      <option value="bg">BG</option>
+      <option value="en">EN</option>
+      <option value="ru">RU</option>
+    </select>
   </div>
 
   <div class="login-wrapper">
@@ -30,13 +44,15 @@
 
       <div class="form-group">
         <label class="form-label">Потребителско име</label>
-        <input type="text" id="username" class="form-input" placeholder="manager1 / employee1" autocomplete="username" />
+        <input type="text" id="username" class="form-input" placeholder="manager1 / employee1"
+          autocomplete="username" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Парола</label>
         <div class="input-with-icon">
-          <input type="password" id="password" class="form-input" placeholder="••••••••" autocomplete="current-password" />
+          <input type="password" id="password" class="form-input" placeholder="••••••••"
+            autocomplete="current-password" />
           <button type="button" class="toggle-pass" onclick="togglePass()">👁</button>
         </div>
       </div>
@@ -47,12 +63,12 @@
       </button>
 
       <p class="login-hint">
-        Мениджър: <code>manager1 / 1234</code><br/>
+        Мениджър: <code>manager1 / 1234</code><br />
         Служители: <code>emp1</code> · <code>emp2</code> · <code>emp3</code> · <code>emp4</code> / <code>1234</code>
       </p>
     </div>
   </div>
-
+  <script src="lang.js"></script>
   <script src="supabase.js"></script>
   <script src="app.js"></script>
   <script>
@@ -65,4 +81,5 @@
     }
   </script>
 </body>
+
 </html>

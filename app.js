@@ -6,16 +6,16 @@
 // ============================================================
 // CONSTANTS & UTILITIES
 // ============================================================
-const MONTHS_BG = ['Януари', 'Февруари', 'Март', 'Април', 'Май', 'Юни', 'Юли', 'Август', 'Септември', 'Октомври', 'Ноември', 'Декември'];
-const DAYS_BG = ['Неделя', 'Понеделник', 'Вторник', 'Сряда', 'Четвъртък', 'Петък', 'Събота'];
-const DAYS_SHORT = ['Нед', 'Пон', 'Вт', 'Ср', 'Чет', 'Пет', 'Съб'];
+const MONTHS_BG = ['Януари', 'Февруари', 'Март', 'Април', 'Май', 'Юни', 'Юли', 'Август', 'Септември', 'Октомври', 'Ноември', 'Декември'].map(t);
+const DAYS_BG = ['Неделя', 'Понеделник', 'Вторник', 'Сряда', 'Четвъртък', 'Петък', 'Събота'].map(t);
+const DAYS_SHORT = ['Нед', 'Пон', 'Вт', 'Ср', 'Чет', 'Пет', 'Съб'].map(t);
 
 const SHIFT_TYPE_MAP = {
-  regular: { label: 'Обичайна', cls: 'shift-reg', icon: '🔵' },
-  '6h': { label: '6 часа', cls: 'shift-6h', icon: '🟢' },
-  '12h': { label: '12 часа', cls: 'shift-12h', icon: '🟠' },
-  weekend: { label: 'Уикенд', cls: 'shift-wknd', icon: '🟣' },
-  overtime: { label: 'Извънреден', cls: 'shift-ot', icon: '🔴' },
+  regular: { label: t('Обичайна'), cls: 'shift-reg', icon: '🔵' },
+  '6h': { label: t('6 часа'), cls: 'shift-6h', icon: '🟢' },
+  '12h': { label: t('12 часа'), cls: 'shift-12h', icon: '🟠' },
+  weekend: { label: t('Уикенд'), cls: 'shift-wknd', icon: '🟣' },
+  overtime: { label: t('Извънреден'), cls: 'shift-ot', icon: '🔴' },
 };
 
 function fmtDate(d) {
@@ -114,7 +114,20 @@ function switchTab(name) {
   if (sec) sec.classList.add('active');
   // Lazy refresh on tab switch
   if (name === 'emp-schedule') renderEmpSchedule();
-  if (name === 'profile') renderProfile();
+  if (name === 'profile') {
+    if (document.body.classList.contains('login-page')) return; // Just safety
+    const user = Auth.getUser();
+    if (user && user.role === 'manager') {
+      const nameEl = document.getElementById('mgr-profile-name');
+      if (nameEl) {
+        nameEl.textContent = user.name;
+        document.getElementById('mgr-profile-username').textContent = '@' + user.username;
+        document.getElementById('mgr-profile-avatar').textContent = initials(user.name);
+      }
+    } else {
+      renderProfile();
+    }
+  }
   if (name === 'reports') renderReports();
 }
 

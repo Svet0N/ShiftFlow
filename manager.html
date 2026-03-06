@@ -51,6 +51,9 @@
     <button class="tab-btn" data-tab="reports" onclick="switchTab('reports')">
       <span class="tab-icon">📊</span><span class="tab-label">Отчети</span>
     </button>
+    <button class="tab-btn" data-tab="profile" onclick="switchTab('profile')">
+      <span class="tab-icon">👤</span><span class="tab-label">Профил</span>
+    </button>
   </nav>
 
   <main class="main-content">
@@ -268,6 +271,54 @@
       </div>
     </section>
 
+    <!-- ===== PROFILE ===== -->
+    <section id="tab-profile" class="tab-section">
+      <div class="section-header">
+        <h2 class="section-title">👤 Профил</h2>
+      </div>
+
+      <div class="glass-card profile-hero">
+        <div class="profile-avatar" id="mgr-profile-avatar">М</div>
+        <div class="profile-meta">
+          <div class="profile-name" id="mgr-profile-name">—</div>
+          <div class="profile-uname" id="mgr-profile-username">—</div>
+          <span class="role-badge manager-badge" style="margin-top:6px;display:inline-block">Мениджър</span>
+        </div>
+      </div>
+
+      <div class="glass-card section-card">
+        <div class="card-title-row"><span class="card-title">⚙️ Настройки</span></div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <span class="setting-label">Език</span>
+            <span class="setting-desc">Смяна на езика на приложението</span>
+          </div>
+          <div class="setting-action">
+            <select id="lang-select-profile" class="form-input form-select"
+              style="padding: 4px 8px; width: auto; font-size: 0.85rem;" onchange="changeLang(this.value)">
+              <option value="bg">Български</option>
+              <option value="en">English</option>
+              <option value="ru">Русский</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <span class="setting-label">🌙 Тъмна тема</span>
+            <span class="setting-desc">Превключи тема</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="theme-toggle" onchange="toggleThemeSwitch(this)">
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-danger btn-full" style="margin-top:1rem" onclick="logout()">🚪 Изход от акаунта</button>
+    </section>
+
   </main>
 
   <!-- ===== MODALS ===== -->
@@ -434,6 +485,7 @@
 
   <div id="toast" class="toast hidden"></div>
 
+  <script src="lang.js"></script>
   <script src="supabase.js"></script>
   <script src="app.js"></script>
   <script>initManagerDashboard();</script>
