@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="bg">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShiftFlow — Мениджър</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0d1117" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <!-- TOP NAV -->
+  <nav class="topnav glass-card">
+    <div class="nav-logo">
+      <span class="logo-icon">⏱</span>
+      <span class="logo-text">ShiftFlow</span>
+      <span class="role-badge manager-badge">Мениджър</span>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" onclick="toggleTheme()" id="theme-btn" title="Тема">🌙</button>
+      <span class="nav-user" id="nav-username">—</span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Изход</button>
+    </div>
+  </nav>
+
+  <!-- BOTTOM TAB NAV -->
+  <nav class="bottom-nav glass-card">
+    <button class="tab-btn active" data-tab="today" onclick="switchTab('today')">
+      <span class="tab-icon">📋</span><span class="tab-label">Днес</span>
+    </button>
+    <button class="tab-btn" data-tab="schedule" onclick="switchTab('schedule')">
+      <span class="tab-icon">📅</span><span class="tab-label">График</span>
+    </button>
+    <button class="tab-btn" data-tab="employees" onclick="switchTab('employees')">
+      <span class="tab-icon">👥</span><span class="tab-label">Служители</span>
+    </button>
+    <button class="tab-btn" data-tab="penalties" onclick="switchTab('penalties')">
+      <span class="tab-icon">⚠️</span><span class="tab-label">Наказания</span>
+    </button>
+    <button class="tab-btn" data-tab="reports" onclick="switchTab('reports')">
+      <span class="tab-icon">📊</span><span class="tab-label">Отчети</span>
+    </button>
+  </nav>
+
+  <main class="main-content">
+
+    <!-- ===== TODAY ===== -->
+    <section id="tab-today" class="tab-section active">
+      <div class="section-header">
+        <h2 class="section-title">📋 Днешен изглед</h2>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="date" id="view-date-picker" class="form-input"
+            style="width:150px;padding:4px 8px;font-size:0.8rem;" onchange="onDatePickerChange(this.value)" />
+          <span class="date-badge" id="today-date-label">—</span>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card glass-card">
+          <span class="stat-num" id="stat-scheduled">0</span>
+          <span class="stat-lbl">Насрочени</span>
+        </div>
+        <div class="stat-card glass-card">
+          <span class="stat-num green" id="stat-arrived">0</span>
+          <span class="stat-lbl">Дошли</span>
+        </div>
+        <div class="stat-card glass-card">
+          <span class="stat-num red" id="stat-noshow">0</span>
+          <span class="stat-lbl">Отсъстващи</span>
+        </div>
+        <div class="stat-card glass-card">
+          <span class="stat-num yellow" id="stat-pending">0</span>
+          <span class="stat-lbl">Неотбелязани</span>
+        </div>
+      </div>
+
+      <div class="glass-card table-card">
+        <div class="table-header">
+          <span>Служител</span>
+          <span>Тип смяна</span>
+          <span>Планирани ч.</span>
+          <span>Статус</span>
+          <span>Действия</span>
+        </div>
+        <div id="today-list" class="table-body">
+          <div class="empty-state">Зареждане...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SCHEDULE ===== -->
+    <section id="tab-schedule" class="tab-section">
+      <div class="section-header">
+        <h2 class="section-title">📅 Месечен График</h2>
+        <div class="month-nav">
+          <button class="icon-btn" onclick="changeMgrCalMonth(-1)">‹</button>
+          <span class="month-label" id="mgr-cal-month-label">—</span>
+          <button class="icon-btn" onclick="changeMgrCalMonth(1)">›</button>
+        </div>
+      </div>
+
+      <div class="calendar-wrap glass-card" style="margin-bottom: 1.5rem;">
+        <div class="cal-weekdays">
+          <span>Пон</span><span>Вт</span><span>Ср</span><span>Чет</span><span>Пет</span>
+          <span class="wknd-hdr">Съб</span><span class="wknd-hdr">Нед</span>
+        </div>
+        <div class="cal-grid" id="mgr-cal-grid"></div>
+      </div>
+
+      <div class="section-header">
+        <h2 class="section-title">📅 Седмичен изглед</h2>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-schedule')">+ Добави</button>
+      </div>
+
+      <div class="week-nav glass-card">
+        <button class="icon-btn" onclick="changeWeek(-1)">‹</button>
+        <span id="week-label" class="week-label">—</span>
+        <button class="icon-btn" onclick="changeWeek(1)">›</button>
+      </div>
+
+      <!-- Shift type filter -->
+      <div class="shift-type-filters glass-card">
+        <span class="filter-label">Вид смяна:</span>
+        <button class="shift-filter-btn active" data-type="all" onclick="filterShiftType('all',this)">Всички</button>
+        <button class="shift-filter-btn" data-type="6h" onclick="filterShiftType('6h',this)">
+          <span class="shift-badge shift-6h">6ч</span>
+        </button>
+        <button class="shift-filter-btn" data-type="12h" onclick="filterShiftType('12h',this)">
+          <span class="shift-badge shift-12h">12ч</span>
+        </button>
+        <button class="shift-filter-btn" data-type="weekend" onclick="filterShiftType('weekend',this)">
+          <span class="shift-badge shift-wknd">Уикенд</span>
+        </button>
+        <button class="shift-filter-btn" data-type="overtime" onclick="filterShiftType('overtime',this)">
+          <span class="shift-badge shift-ot">Извънреден</span>
+        </button>
+      </div>
+
+      <div class="schedule-grid glass-card" id="schedule-grid">
+        <div class="empty-state">Зареждане...</div>
+      </div>
+    </section>
+
+    <!-- ===== EMPLOYEES ===== -->
+    <section id="tab-employees" class="tab-section">
+      <div class="section-header">
+        <h2 class="section-title">👥 Служители</h2>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-employee')">+ Нов служител</button>
+      </div>
+      <div class="employees-grid" id="employees-grid">
+        <div class="empty-state">Зареждане...</div>
+      </div>
+    </section>
+
+    <!-- ===== PENALTIES ===== -->
+    <section id="tab-penalties" class="tab-section">
+      <div class="section-header">
+        <h2 class="section-title">⚠️ Наказания</h2>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-penalty')">+ Добави</button>
+      </div>
+
+      <!-- Filter by employee -->
+      <div class="glass-card" style="padding:0.75rem 1rem;margin-bottom:0.75rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <span style="font-size:0.78rem;color:var(--text-muted)">Филтър:</span>
+          <select id="pen-filter-emp" class="form-input form-select" style="flex:1;max-width:220px;"
+            onchange="renderPenaltiesTab()">
+            <option value="">Всички служители</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="penalties-list glass-card" id="penalties-list">
+        <div class="empty-state">Зареждане...</div>
+      </div>
+    </section>
+
+    <!-- ===== REPORTS ===== -->
+    <section id="tab-reports" class="tab-section">
+      <div class="section-header">
+        <h2 class="section-title">📊 Отчети и Експорт</h2>
+      </div>
+
+      <!-- Month selector -->
+      <div class="glass-card" style="padding:0.85rem 1rem;margin-bottom:0.75rem;">
+        <div class="section-header" style="margin:0;">
+          <span style="font-size:0.85rem;font-weight:600;">Период:</span>
+          <div class="month-nav">
+            <button class="icon-btn" onclick="changeReportMonth(-1)">‹</button>
+            <span class="month-label" id="report-month-label">—</span>
+            <button class="icon-btn" onclick="changeReportMonth(1)">›</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card glass-card kpi-accent">
+          <div class="kpi-icon-bg">👥</div>
+          <div class="kpi-info">
+            <div class="kpi-value" id="rep-employees">0</div>
+            <div class="kpi-label">Активни служители</div>
+          </div>
+        </div>
+        <div class="kpi-card glass-card kpi-teal">
+          <div class="kpi-icon-bg">⏰</div>
+          <div class="kpi-info">
+            <div class="kpi-value" id="rep-hours">0</div>
+            <div class="kpi-label">Общо часове</div>
+          </div>
+        </div>
+        <div class="kpi-card glass-card kpi-green">
+          <div class="kpi-icon-bg">💰</div>
+          <div class="kpi-info">
+            <div class="kpi-value" id="rep-salary">0 лв.</div>
+            <div class="kpi-label">Общи заплати</div>
+          </div>
+        </div>
+        <div class="kpi-card glass-card kpi-red">
+          <div class="kpi-icon-bg">⚠️</div>
+          <div class="kpi-info">
+            <div class="kpi-value" id="rep-penalties">0 лв.</div>
+            <div class="kpi-label">Наказания</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Per-employee table -->
+      <div class="glass-card table-card" style="margin-bottom:1rem;">
+        <div class="table-header" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr;">
+          <span>Служител</span>
+          <span>Часове</span>
+          <span>Дни</span>
+          <span>Наказания</span>
+          <span>Заплата</span>
+        </div>
+        <div id="report-table" class="table-body"></div>
+      </div>
+
+      <!-- Export buttons -->
+      <div class="glass-card section-card">
+        <div class="card-title-row"><span class="card-title">⬇️ Изтегли отчет</span></div>
+        <div class="export-btns">
+          <button class="btn btn-ghost export-btn" onclick="exportCSV()">
+            <span class="export-icon">📄</span>
+            <span>CSV</span>
+          </button>
+          <button class="btn btn-ghost export-btn" onclick="exportExcel()">
+            <span class="export-icon">📊</span>
+            <span>Excel</span>
+          </button>
+          <button class="btn btn-ghost export-btn" onclick="exportPDF()">
+            <span class="export-icon">📋</span>
+            <span>PDF</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== MODALS ===== -->
+
+  <!-- Add Employee -->
+  <div class="modal-overlay hidden" id="modal-add-employee">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <h3>👤 Нов служител</h3>
+        <button class="icon-btn" onclick="closeModal('modal-add-employee')">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пълно име</label>
+        <input type="text" id="new-emp-name" class="form-input" placeholder="Иван Петров" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Потребителско име</label>
+        <input type="text" id="new-emp-username" class="form-input" placeholder="ivan.petrov" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Парола</label>
+        <input type="text" id="new-emp-password" class="form-input" placeholder="Парола за служителя" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Часова ставка (лв./ч)</label>
+        <input type="number" id="new-emp-rate" class="form-input" placeholder="9.00" step="0.5" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-add-employee')">Отказ</button>
+        <button class="btn btn-primary" onclick="createEmployee()">Създай</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Schedule -->
+  <div class="modal-overlay hidden" id="modal-add-schedule">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <h3>📅 Добави в Графика</h3>
+        <button class="icon-btn" onclick="closeModal('modal-add-schedule')">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Служител</label>
+        <select id="sched-emp" class="form-input form-select"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Дата</label>
+        <input type="date" id="sched-date" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Вид смяна</label>
+        <div class="shift-type-picker">
+          <button class="stype-btn" data-type="regular" onclick="selectShiftType('regular',this)">🔵 Обичайна</button>
+          <button class="stype-btn" data-type="6h" onclick="selectShiftType('6h',this)">🟢 6 часа</button>
+          <button class="stype-btn" data-type="12h" onclick="selectShiftType('12h',this)">🟠 12 часа</button>
+          <button class="stype-btn" data-type="weekend" onclick="selectShiftType('weekend',this)">🟣 Уикенд</button>
+          <button class="stype-btn" data-type="overtime" onclick="selectShiftType('overtime',this)">🔴
+            Извънреден</button>
+        </div>
+        <input type="hidden" id="sched-type" value="regular" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Планирани часове</label>
+        <div class="hours-picker">
+          <button class="hours-btn" onclick="setHours(6)">6ч</button>
+          <button class="hours-btn" onclick="setHours(8)">8ч</button>
+          <button class="hours-btn" onclick="setHours(10)">10ч</button>
+          <button class="hours-btn" onclick="setHours(12)">12ч</button>
+        </div>
+        <input type="number" id="sched-hours" class="form-input mt-sm" placeholder="Часове" min="1" max="24" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Бележка</label>
+        <input type="text" id="sched-note" class="form-input" placeholder="Сутринна смяна..." />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-add-schedule')">Отказ</button>
+        <button class="btn btn-primary" onclick="addSchedule()">Запази</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Penalty -->
+  <div class="modal-overlay hidden" id="modal-add-penalty">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <h3>⚠️ Добави Наказание</h3>
+        <button class="icon-btn" onclick="closeModal('modal-add-penalty')">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Служител</label>
+        <select id="pen-emp" class="form-input form-select"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Сума (лв.)</label>
+        <input type="number" id="pen-amount" class="form-input" placeholder="20.00" step="0.5" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Дата</label>
+        <input type="date" id="pen-date" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Причина</label>
+        <textarea id="pen-note" class="form-input form-textarea" placeholder="Закъснение 30 мин..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-add-penalty')">Отказ</button>
+        <button class="btn btn-danger" onclick="addPenalty()">Добави</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Hours -->
+  <div class="modal-overlay hidden" id="modal-edit-hours">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <h3>✏️ Редактирай Смяна</h3>
+        <button class="icon-btn" onclick="closeModal('modal-edit-hours')">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Служител</label>
+        <input type="text" id="edit-emp-name" class="form-input" readonly />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Отработени часове</label>
+        <div class="hours-picker">
+          <button class="hours-btn" onclick="document.getElementById('edit-hours').value=6">6ч</button>
+          <button class="hours-btn" onclick="document.getElementById('edit-hours').value=8">8ч</button>
+          <button class="hours-btn" onclick="document.getElementById('edit-hours').value=10">10ч</button>
+          <button class="hours-btn" onclick="document.getElementById('edit-hours').value=12">12ч</button>
+        </div>
+        <input type="number" id="edit-hours" class="form-input mt-sm" min="0" max="24" step="0.5" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Статус</label>
+        <select id="edit-status" class="form-input form-select">
+          <option value="present">✓ Присъствал</option>
+          <option value="absent">✗ Отсъствал</option>
+          <option value="penalty">⚠ Наказание</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Бележка</label>
+        <input type="text" id="edit-note" class="form-input" placeholder="Бележка за смяната..." />
+      </div>
+      <input type="hidden" id="edit-shift-id" />
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-edit-hours')">Отказ</button>
+        <button class="btn btn-primary" onclick="saveEditedHours()">Запази</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Detail Modal -->
+  <div class="modal-overlay hidden" id="modal-emp-detail">
+    <div class="modal modal-lg glass-card">
+      <div class="modal-header">
+        <h3 id="emp-detail-title">—</h3>
+        <button class="icon-btn" onclick="closeModal('modal-emp-detail')">✕</button>
+      </div>
+      <div id="emp-detail-content"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="supabase.js"></script>
+  <script src="app.js"></script>
+  <script>initManagerDashboard();</script>
+</body>
+
+</html>
